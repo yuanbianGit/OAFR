@@ -91,7 +91,6 @@ class Backbone(nn.Module):
 
     def forward(self, x, occ_agu=False,  personOCC_pro = 0.5,label=None, cam_label= None, view_label=None):  # label is unused if self.cos_layer == 'no'
         side_L = int(x.size(3))
-        '''这个地方的长宽要改！'''
         if occ_agu and self.training:
             pro = random.random()
             if pro > (1 - personOCC_pro):
@@ -1572,12 +1571,10 @@ class build_swin_oafr(nn.Module):
             x = self.base.layers[i](x)
 
         x = self.base.norm(x)  # B L C
-        # 这里写成转为B,C,H,W的形状！ 然后输出！
         # print(x.size())
         feat_map_cls = einops.rearrange(x, 'b (h w) l -> b l h w', h=7)
 
         if self.training:
-            '''要新加的loss加在这里'''
 
             # occ_lable_h = occ_label[:,0]
             # where = torch.not_equal(occ_lable_h, 1)
