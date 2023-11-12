@@ -31,7 +31,7 @@ def euclidean_distance_weight(x, y, w_x, w_y):
         dis[i] = torch.mul(torch.tensor(eu_dist), w[i])
     dis_sum = torch.sum(dis, dim=0, keepdim=False)
     w_sum = torch.sum(w, dim=0, keepdim=False)
-    distance = dis_sum/w_sum  #除以这个加权是要对距离进行归一化，因为可能有些计算了两块的距离，有些计算了三块的距离！
+    distance = dis_sum/w_sum  
 
     return distance.cpu().numpy()
 
@@ -64,7 +64,7 @@ def euclidean_distance_weight4Rerank(x, y, w_x, w_y):
         dis[i] = torch.mul(torch.tensor(eu_dist), w[i])
     dis_sum = torch.sum(dis, dim=0, keepdim=False)
     w_sum = torch.sum(w, dim=0, keepdim=False)
-    distance = dis_sum/w_sum  #除以这个加权是要对距离进行归一化，因为可能有些计算了两块的距离，有些计算了三块的距离！
+    distance = dis_sum/w_sum  
 
     return distance.cpu().numpy()
 
@@ -230,7 +230,7 @@ class R1_mAP_eval():
 
             # local_feat = [torch.nn.functional.normalize(self.l_w[i], axis=-1) for i in range(len(self.l_w))]
         # query
-        # 这里可以设置只算global或者局部的特征！
+        
         q_gf = g_feats[:self.num_query]
         q_lf = l_feats[:, :self.num_query, :]
         q_w = feats_w[:, :self.num_query]
@@ -269,7 +269,7 @@ class R1_mAP_eval():
 
             # local_feat = [torch.nn.functional.normalize(self.l_w[i], axis=-1) for i in range(len(self.l_w))]
         # query
-        # 这里可以设置只算global或者局部的特征！
+        
         q_gf = g_feats[:self.num_query]
         q_lf = l_feats[:, :self.num_query, :]
         q_w = feats_w[:, :self.num_query]
@@ -338,8 +338,7 @@ class R1_mAP_eval():
             q_w_ori = q_w.permute(1, 0)
             q_recovery = q_lf.permute(1,0,2) *q_w_ori.unsqueeze(dim=-1) + g_near_feat* q_need_w.unsqueeze(dim=-1)
             q_recovery = q_recovery.permute(1,0,2)
-            '''问题：现在的recover的方式是直接将Q全赋值为1；不合理，下一步怎么赋值为补全的！？'''
-            # q_recovery_w = torch.ones_like(q_w)  #默认都补全了
+            # q_recovery_w = torch.ones_like(q_w)  
             q_recovery_w = q_w + q_need_w.permute(1, 0) * g_w_Knearst_represnet.permute(1, 0)
         elif recover_method == 'soft_label':
             q_need_vis = (1 - q_vis).permute(1, 0)  # (2210,7)
@@ -360,7 +359,6 @@ class R1_mAP_eval():
             distmat = euclidean_distance_weight(q_recovery, g_lf, q_recovery_w, g_w)
 
 
-        '''打印 一下featRecover之后变化的哪些'''
         indices_feat_recovery = np.argsort(distmat, axis=1)
         indices_feat_recovery = torch.tensor(indices_feat_recovery)
         # matches_ori = (g_pids[indices] == q_pids[:, np.newaxis]).astype(np.int32)
@@ -421,7 +419,6 @@ class R1_mAP_eval():
 
             # local_feat = [torch.nn.functional.normalize(self.l_w[i], axis=-1) for i in range(len(self.l_w))]
         # query
-        # 这里可以设置只算global或者局部的特征！
         q_gf = g_feats[:self.num_query]
 
         q_lf = l_feats[:, :self.num_query, :]
